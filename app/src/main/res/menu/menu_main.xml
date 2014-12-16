@@ -1,0 +1,39 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/my">
+
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/abc_ic_search_api_mtrl_alpha"
+        android:actionViewClass="android.widget.SearchView"
+        android:actionProviderClass="android.widget.ShareActionProvider"
+        android:showAsAction="ifRoom|collapseActionView"
+        android:title="@string/search" />
+
+    <item
+        android:id="@+id/add"
+        android:icon="@drawable/actionbar_add_icon"
+        android:title="@string/add"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
+        android:id="@+id/startChat"
+        android:icon="@drawable/ic_menu_start_conversation"
+        android:title="@string/start_multi_user_chat"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/add_friends"
+        android:icon="@drawable/ic_menu_allfriends"
+        android:title="@string/add_friends"/>
+
+    <item
+        android:id="@+id/scan"
+        android:icon="@drawable/ofm_qrcode_icon"
+        android:title="@string/scan"/>
+
+    <item
+        android:id="@+id/feedback"
+        android:icon="@drawable/ofm_feedback_icon"
+        android:title="@string/feedback"/>
+</menu>
