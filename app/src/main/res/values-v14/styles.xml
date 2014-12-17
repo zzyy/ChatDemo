@@ -5,8 +5,9 @@
         AppBaseTheme from res/values/styles.xml on API 11+ devices.
     -->
 
-    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="android:actionOverflowButtonStyle">@style/WeChatActionButtonOverflow</item>
+        <item name="android:homeAsUpIndicator">@drawable/abc_ic_clear_mtrl_alpha</item>
     </style>
 
     <style name="WeChatActionButtonOverflow" parent="android:style/Widget.Holo.ActionButton.Overflow">

@@ -1,5 +1,9 @@
 package com.zy.chat;
 
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
+import android.content.Context;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,21 +11,44 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
 import android.view.Window;
+import android.widget.ArrayAdapter;
+import android.widget.SpinnerAdapter;
+import android.widget.Toast;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends FragmentActivity {
 
     private static final String TAG = "zy";
 
+    Context mContext;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContext = this;
+
         setOverflowShowingAlways();
+        ActionBar actionBar = getActionBar();
+        actionBar.setDisplayShowHomeEnabled(false);
+        actionBar.setDisplayShowTitleEnabled(false);
+
+        SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.navigate_list,
+                android.R.layout.simple_spinner_dropdown_item);
+        ActionBar.OnNavigationListener onNavigationListener = new ActionBar.OnNavigationListener(){
+
+            @Override
+            public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+                Toast.makeText(mContext, "itemPosition=" + itemPosition + "; itemId=" + itemId,
+                        Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        };
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        actionBar.setListNavigationCallbacks(spinnerAdapter, onNavigationListener);
+
+
     }
 
 
@@ -65,15 +92,20 @@ public class MainActivity extends ActionBarActivity {
         return super.onMenuOpened(featureId, menu);
     }
 
-    private void setOverflowShowingAlways(){
-        ViewConfiguration viewConfiguration = ViewConfiguration.get(this);
-        try {
-            Field menuKeyField = ViewConfiguration.class.getField("sHasPermanentMenuKey");
+    //设置不存在menu键, 始终显示overflow button
+    private void setOverflowShowingAlways()
+    {
+        try
+        {
+            // true if a permanent menu key is present, false otherwise.
+            ViewConfiguration config = ViewConfiguration.get(this);
+            Field menuKeyField = ViewConfiguration.class
+                    .getDeclaredField("sHasPermanentMenuKey");
             menuKeyField.setAccessible(true);
-            menuKeyField.set(viewConfiguration, false);
-        } catch (Exception e) {
+            menuKeyField.setBoolean(config, false);
+        } catch (Exception e)
+        {
             e.printStackTrace();
         }
-
     }
 }

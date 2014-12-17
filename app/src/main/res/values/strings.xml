@@ -10,5 +10,6 @@
     <string name="add">add</string>
     <string name="scan">scan</string>
     <string name="feedback">feedback</string>
+    <string name="action_search">search</string>
 
 </resources>
