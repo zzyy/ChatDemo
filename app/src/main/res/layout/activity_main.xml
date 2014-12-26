@@ -1,16 +1,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:zy="http://schemas.android.com/apk/res/com.zy.chat"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <FrameLayout
+    <android.support.v4.view.ViewPager
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#ffd3d3d3"
-        ></FrameLayout>
+        android:background="#ffd3d3d3">
+
+
+    </android.support.v4.view.ViewPager>
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -21,27 +24,35 @@
         android:paddingTop="5dp"
         android:weightSum="4">
 
-        <Button
+        <com.zy.chat.ui.ChangeColorButton
+            android:id="@+id/first"
             android:layout_width="0dp"
             android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:background="@drawable/main_item_bg"
-            />
+            zy:icon="@drawable/ic_menu_start_conversation"
+            zy:text="微信"
+            zy:text_size="12sp"/>
 
-        <TextView
+        <com.zy.chat.ui.ChangeColorButton
+            android:id="@+id/second"
             android:layout_width="0dp"
             android:layout_height="fill_parent"
-            android:layout_weight="1" />
+            zy:icon="@drawable/ic_menu_friendslist"
+            zy:text="通讯录"/>
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="1" />
 
-        <TextView
+        <com.zy.chat.ui.ChangeColorButton
+            android:id="@+id/third"
             android:layout_width="0dp"
             android:layout_height="fill_parent"
-            android:layout_weight="1" />
+            zy:icon="@drawable/ic_menu_emoticons"
+            zy:text="发现"/>
+
+        <com.zy.chat.ui.ChangeColorButton
+            android:id="@+id/fourth"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            zy:icon="@drawable/ic_menu_allfriends"
+            zy:text="我"/>
 
     </LinearLayout>
 </LinearLayout>
