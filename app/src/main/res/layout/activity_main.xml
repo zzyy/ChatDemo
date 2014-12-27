@@ -18,17 +18,14 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="60dp"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingBottom="8dp"
-        android:paddingTop="5dp"
         android:weightSum="4">
 
         <com.zy.chat.ui.ChangeColorButton
             android:id="@+id/first"
             android:layout_width="0dp"
             android:layout_height="fill_parent"
-            zy:icon="@drawable/ic_menu_start_conversation"
+            android:background="@android:color/black"
+            zy:icon="@drawable/ic_menu_cc"
             zy:text="微信"
             zy:text_size="12sp"/>
 
@@ -37,7 +34,8 @@
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             zy:icon="@drawable/ic_menu_friendslist"
-            zy:text="通讯录"/>
+            zy:text="通讯录"
+            zy:text_size="12sp"/>
 
 
         <com.zy.chat.ui.ChangeColorButton
@@ -45,14 +43,16 @@
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             zy:icon="@drawable/ic_menu_emoticons"
-            zy:text="发现"/>
+            zy:text="发现"
+            zy:text_size="12sp"/>
 
         <com.zy.chat.ui.ChangeColorButton
             android:id="@+id/fourth"
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             zy:icon="@drawable/ic_menu_allfriends"
-            zy:text="我"/>
+            zy:text="我"
+            zy:text_size="12sp"/>
 
     </LinearLayout>
 </LinearLayout>
