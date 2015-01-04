@@ -105,6 +105,8 @@ public class ChangeColorButton extends View {
         int left = (getMeasuredWidth() - bitmapWidth) / 2;
         int top = (int) ((getMeasuredHeight() - mTextHeight) / 2 - bitmapWidth/ 2);
 
+        Log.d("zy", "");
+
         mIconRect = new Rect(left, top, left + bitmapWidth, top + bitmapWidth);
         Log.d("zy", String.format("bitmapWidth=%d; getMeasuredHeight=%d; getMeasuredWidth=%d" , bitmapWidth, getMeasuredHeight(), getMeasuredHeight()));
         Log.d("zy" , "mIconRect=" + mIconRect);
