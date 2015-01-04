@@ -7,6 +7,7 @@
     tools:context=".MainActivity">
 
     <android.support.v4.view.ViewPager
+        android:id="@+id/content"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -16,15 +17,17 @@
     </android.support.v4.view.ViewPager>
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:layout_margin="5dp"
+        android:orientation="horizontal"
         android:weightSum="4">
 
         <com.zy.chat.ui.ChangeColorButton
             android:id="@+id/first"
             android:layout_width="0dp"
             android:layout_height="fill_parent"
-            android:background="@android:color/black"
+            android:layout_weight="1"
             zy:icon="@drawable/ic_menu_cc"
             zy:text="微信"
             zy:text_size="12sp"/>
@@ -34,6 +37,7 @@
             android:layout_width="0dp"
             android:layout_height="fill_parent"
             zy:icon="@drawable/ic_menu_friendslist"
+            android:layout_weight="1"
             zy:text="通讯录"
             zy:text_size="12sp"/>
 
@@ -42,6 +46,7 @@
             android:id="@+id/third"
             android:layout_width="0dp"
             android:layout_height="fill_parent"
+            android:layout_weight="1"
             zy:icon="@drawable/ic_menu_emoticons"
             zy:text="发现"
             zy:text_size="12sp"/>
@@ -50,6 +55,7 @@
             android:id="@+id/fourth"
             android:layout_width="0dp"
             android:layout_height="fill_parent"
+            android:layout_weight="1"
             zy:icon="@drawable/ic_menu_allfriends"
             zy:text="我"
             zy:text_size="12sp"/>

@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Chat.iml" filepath="$PROJECT_DIR$/Chat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/actionbardemo/actionbardemo.iml" filepath="$PROJECT_DIR$/actionbardemo/actionbardemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/slidmenu/slidmenu.iml" filepath="$PROJECT_DIR$/slidmenu/slidmenu.iml" />
+      <module fileurl="file://$PROJECT_DIR$/weChat.iml" filepath="$PROJECT_DIR$/weChat.iml" />
     </modules>
   </component>
 </project>
