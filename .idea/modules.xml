@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/actionbardemo/actionbardemo.iml" filepath="$PROJECT_DIR$/actionbardemo/actionbardemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/slidmenu/slidmenu.iml" filepath="$PROJECT_DIR$/slidmenu/slidmenu.iml" />
+      <module fileurl="file://$PROJECT_DIR$/slidemenu/left_slidemenu.iml" filepath="$PROJECT_DIR$/slidemenu/left_slidemenu.iml" />
+      <module fileurl="file://$PROJECT_DIR$/slidemenu2/slidemenu2.iml" filepath="$PROJECT_DIR$/slidemenu2/slidemenu2.iml" />
       <module fileurl="file://$PROJECT_DIR$/weChat.iml" filepath="$PROJECT_DIR$/weChat.iml" />
     </modules>
   </component>
