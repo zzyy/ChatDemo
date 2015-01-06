@@ -7,9 +7,9 @@
         android:id="@+id/slide_menu"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:menuWidth="300dp">
+        app:menuWidth="200dp">
 
-        <LinearLayout
+        <zy.com.slidemenu2.ui.MyLinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
@@ -42,7 +42,7 @@
                 </LinearLayout>
             </FrameLayout>
 
-        </LinearLayout>
+        </zy.com.slidemenu2.ui.MyLinearLayout>
 
     </zy.com.slidemenu2.ui.SlideMenu>
 

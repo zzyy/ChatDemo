@@ -1,50 +1,22 @@
-package zy.com.slidemenu2;
+package com.zy.toucheventdemo;
 
-import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-
-import zy.com.slidemenu2.ui.SlideMenu;
+import android.view.MotionEvent;
 
 
 public class MainActivity extends ActionBarActivity {
     private static final String TAG = "zy";
 
-    SlideMenu mSlideMenu;
-    ViewGroup mContentViewGroup;
-    ViewGroup mLeftmenu;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mSlideMenu = (SlideMenu) findViewById(R.id.slide_menu);
-        mContentViewGroup = (ViewGroup) findViewById(R.id.content);
-        mLeftmenu = (ViewGroup) findViewById(R.id.left_menu);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        mLeftmenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "menu onClick");
-            }
-        });
-
-        mContentViewGroup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "content onClick");
-            }
-        });
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -68,7 +40,15 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void toggleMenu(View view){
-        mSlideMenu.toggleMenu();
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        Log.d(TAG, "activity dispatchTouchEvent");
+        return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Log.d(TAG, "activity onTouchEvent");
+        return super.onTouchEvent(event);
     }
 }

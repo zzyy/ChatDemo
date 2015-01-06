@@ -1,2 +1,1 @@
-include ':app', ':left_slidemenu', ':slidemenu2'
-project(':left_slidemenu').projectDir = new File('slidemenu')
+include ':slidemenu', ':slidemenu2', ':app', ':toucheventdemo', ':bouncescroll'

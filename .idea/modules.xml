@@ -2,10 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Chat.iml" filepath="$PROJECT_DIR$/Chat.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/slidemenu/left_slidemenu.iml" filepath="$PROJECT_DIR$/slidemenu/left_slidemenu.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bouncescroll/bouncescroll.iml" filepath="$PROJECT_DIR$/bouncescroll/bouncescroll.iml" />
+      <module fileurl="file://$PROJECT_DIR$/slidemenu/slidemenu.iml" filepath="$PROJECT_DIR$/slidemenu/slidemenu.iml" />
       <module fileurl="file://$PROJECT_DIR$/slidemenu2/slidemenu2.iml" filepath="$PROJECT_DIR$/slidemenu2/slidemenu2.iml" />
-      <module fileurl="file://$PROJECT_DIR$/weChat.iml" filepath="$PROJECT_DIR$/weChat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/toucheventdemo/toucheventdemo.iml" filepath="$PROJECT_DIR$/toucheventdemo/toucheventdemo.iml" />
     </modules>
   </component>
 </project>

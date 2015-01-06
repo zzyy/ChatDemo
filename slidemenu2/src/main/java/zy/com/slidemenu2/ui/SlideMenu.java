@@ -13,6 +13,8 @@ import android.view.WindowManager;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
+import com.nineoldandroids.view.ViewHelper;
+
 import zy.com.slidemenu2.R;
 
 
@@ -24,7 +26,7 @@ public class SlideMenu extends HorizontalScrollView {
 
     private int mScreenWidth;
 
-    private int mLeftMenuWidth = 200;    //50dp
+    private int mLeftMenuWidth = 200;    //dp
     private int mLeftMenuWidthPx;
 
     private boolean isOpen;
@@ -156,7 +158,14 @@ public class SlideMenu extends HorizontalScrollView {
 
         float ratio = l*1.0f/mLeftMenuWidthPx;
 
-        content.setTranslationX(-1*(1-ratio)*mLeftMenuWidthPx);
+        ViewHelper.setTranslationX(content, (ratio-1)*mLeftMenuWidthPx);
+//        content.setTranslationX(-1*(1-ratio)*mLeftMenuWidthPx);
+//        ViewHelper.setTranslationX(leftMenu ,ratio*mLeftMenuWidthPx);
 //        leftMenu.setTranslationX(ratio*mLeftMenuWidthPx);
     }
+
+    public void menuBringToFront(){
+        leftMenu.bringToFront();
+    }
+
 }
