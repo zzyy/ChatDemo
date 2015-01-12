@@ -1,36 +1,19 @@
-package com.zy.bouncescroll;
+package com.zy.imageloader;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 
 public class MainActivity extends ActionBarActivity {
-private static final String TAG="zy";
-    private ViewGroup content;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        content = (ViewGroup) findViewById(R.id.content);
-
-        Log.d(TAG, "content.getHeight()=" + content.getHeight() +"; content.getMeasuredHeight()="+ content.getMeasuredHeight());
     }
 
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        Log.d(TAG, "content.getHeight()=" + content.getHeight() + "; content.getMeasuredHeight()=" + content.getMeasuredHeight());
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -52,9 +35,5 @@ private static final String TAG="zy";
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void logHeight(View view) {
-        Log.d(TAG, "logHeight--content.getHeight()=" + content.getHeight() + "; content.getMeasuredHeight()=" + content.getMeasuredHeight());
     }
 }
