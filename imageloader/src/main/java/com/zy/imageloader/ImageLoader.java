@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v4.util.LruCache;
@@ -24,7 +23,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashSet;
 
 /**
@@ -122,23 +120,24 @@ public class ImageLoader {
     }
 
     public void addBitmapToMemoery(String key, Bitmap value) {
-        if (getBitmapFromMemory(key) == null) {
+        if (getBitmapFromMemoryCache(key) == null) {
             mImageMemoryCache.put(key, value);
         }
     }
 
-    public Bitmap getBitmapFromMemory(String key) {
+    public Bitmap getBitmapFromMemoryCache(String key) {
         return mImageMemoryCache.get(key);
     }
 
+
     public void loadBitmap(String url) {
-        Bitmap bitmap = getBitmapFromMemory(url);
+        Bitmap bitmap = getBitmapFromMemoryCache(url);
         if (bitmap == null) {
             BitmapWorkerTask task = new BitmapWorkerTask();
             taskCollection.add(task);
             task.execute(url);
         } else {
-            callOnLoadedBitmap(bitmap);
+            callOnLoadedBitmap(url, bitmap);
         }
     }
 
@@ -278,14 +277,14 @@ Log.d(TAG, "image download finished");
         protected void onPostExecute(Bitmap bitmap) {
             taskCollection.remove(this);
 
-            callOnLoadedBitmap(bitmap);
+            callOnLoadedBitmap(imageUrl, bitmap);
         }
     }
 
 
-    void callOnLoadedBitmap(Bitmap bitmap) {
+    void callOnLoadedBitmap(String url, Bitmap bitmap) {
         if (mOnLoadedBitmapListener != null) {
-            mOnLoadedBitmapListener.loadedBitmap(bitmap);
+            mOnLoadedBitmapListener.loadedBitmap(url, bitmap);
         }
     }
 
@@ -294,7 +293,7 @@ Log.d(TAG, "image download finished");
     }
 
     public interface OnLoadedBitmapListener {
-        void loadedBitmap(Bitmap bitmap);
+        void loadedBitmap(String url, Bitmap bitmap);
     }
 }
 

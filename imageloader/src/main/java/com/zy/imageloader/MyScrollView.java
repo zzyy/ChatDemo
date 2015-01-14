@@ -102,14 +102,15 @@ public class MyScrollView  extends ScrollView implements ImageLoader.OnLoadedBit
 
             if (borderBottom > getScrollY()
                     && borderTop < getScrollY() + scrollViewHeight) {
-//                String imageUrl = (String) imageView.getTag(R.string.image_url);
+                String imageUrl = (String) imageView.getTag(R.string.image_url);
                 Bitmap bitmap = imageLoader.getBitmapFromMemoryCache(imageUrl);
                 if (bitmap != null) {
                     imageView.setImageBitmap(bitmap);
-                } else {
-                    LoadImageTask task = new LoadImageTask(imageView);
-                    task.execute(imageUrl);
                 }
+//                else {
+//                    LoadImageTask task = new LoadImageTask(imageView);
+//                    task.execute(imageUrl);
+//                }
             } else {
                 imageView.setImageResource(R.drawable.empty_photo);
             }
@@ -153,17 +154,18 @@ public class MyScrollView  extends ScrollView implements ImageLoader.OnLoadedBit
 
     }
 
+    //加载图片后 回调
     @Override
-    public void loadedBitmap(Bitmap bitmap) {
+    public void loadedBitmap(String url, Bitmap bitmap) {
         Log.d(TAG, "loadedBitmap; bitmap=" + bitmap);
         if (bitmap != null){
             double ratio = bitmap.getWidth()/columnWidth*1.0;
             int scaledHeight = (int) (bitmap.getHeight()/ratio);
-            addImage(bitmap, columnWidth, scaledHeight);
+            addImage(url, bitmap, columnWidth, scaledHeight);
         }
     }
 
-    private void addImage(Bitmap bitmap, int imageWidth, int imageHeight) {
+    private void addImage(String url, Bitmap bitmap, int imageWidth, int imageHeight) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(imageWidth, imageHeight);
 
         final ImageView mImageView = new ImageView(getContext());
@@ -171,7 +173,7 @@ public class MyScrollView  extends ScrollView implements ImageLoader.OnLoadedBit
         mImageView.setImageBitmap(bitmap);
         mImageView.setScaleType(ImageView.ScaleType.FIT_XY);
         mImageView.setPadding(5, 5, 5, 5);
-//        mImageView.setTag();
+        mImageView.setTag(R.string.image_url, url);
 
         findColumnToAdd(mImageView, imageHeight).addView(mImageView);
         imageViewList.add(mImageView);

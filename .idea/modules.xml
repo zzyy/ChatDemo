@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/Chat.iml" filepath="$PROJECT_DIR$/Chat.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/bouncescroll/bouncescroll.iml" filepath="$PROJECT_DIR$/bouncescroll/bouncescroll.iml" />
+      <module fileurl="file://$PROJECT_DIR$/chat.iml" filepath="$PROJECT_DIR$/chat.iml" />
       <module fileurl="file://$PROJECT_DIR$/imageloader/imageloader.iml" filepath="$PROJECT_DIR$/imageloader/imageloader.iml" />
       <module fileurl="file://$PROJECT_DIR$/slidemenu/slidemenu.iml" filepath="$PROJECT_DIR$/slidemenu/slidemenu.iml" />
       <module fileurl="file://$PROJECT_DIR$/slidemenu2/slidemenu2.iml" filepath="$PROJECT_DIR$/slidemenu2/slidemenu2.iml" />
