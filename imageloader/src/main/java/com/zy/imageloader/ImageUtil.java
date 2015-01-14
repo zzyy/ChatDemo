@@ -3,6 +3,8 @@ package com.zy.imageloader;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.io.FileDescriptor;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -31,6 +33,32 @@ public class ImageUtil {
         options.inJustDecodeBounds = false;
 
         return BitmapFactory.decodeFile(pathName, options);
+    }
+
+    public static Bitmap decodeSimpleBitmapFromStream(InputStream inputStream, int reqWidth){
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+
+        BitmapFactory.decodeStream(inputStream, null, options);
+        final int inSampleSize = ImageUtil.calcaluteInSampleSize(options, reqWidth);
+
+        options.inSampleSize = inSampleSize;
+        options.inJustDecodeBounds = false;
+
+        return BitmapFactory.decodeStream(inputStream, null, options);
+    }
+
+    public static Bitmap decodeSimpleBitmapFromFileDescriptor(FileDescriptor fileDescriptor, int reqWidth){
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+
+        BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
+        final int inSampleSize = ImageUtil.calcaluteInSampleSize(options, reqWidth);
+
+        options.inSampleSize = inSampleSize;
+        options.inJustDecodeBounds = false;
+
+        return BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
     }
 
     public static String hashKeyForDisk(String key){

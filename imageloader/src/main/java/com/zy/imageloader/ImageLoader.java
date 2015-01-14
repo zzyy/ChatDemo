@@ -8,6 +8,9 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v4.util.LruCache;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.WindowManager;
 
 import com.jakewharton.disklrucache.DiskLruCache;
 
@@ -28,6 +31,7 @@ import java.util.HashSet;
  * Created by Simon on 2015/1/12.
  */
 public class ImageLoader {
+    private static final String TAG = "zy";
     private Context mContext;
 
     private static LruCache<String, Bitmap> mImageMemoryCache;
@@ -38,6 +42,7 @@ public class ImageLoader {
     private HashSet<BitmapWorkerTask> taskCollection;
 
     private OnLoadedBitmapListener mOnLoadedBitmapListener;
+    private int mImageWidth;
 
     public static ImageLoader getInstance() {
         if (mInstance == null) {
@@ -60,19 +65,37 @@ public class ImageLoader {
 
         mContext = AppApplication.getContext();
 
+        mImageWidth = getScreenWidth(mContext)/3;
+
         try {
             File cacheDir = getDiskCacheDir(mContext, "thunbnail");
             if (!cacheDir.exists()) {
                 cacheDir.mkdirs();
             }
 
-            mDiskLruCache = DiskLruCache.open(cacheDir, getAppVersion(mContext), 1, 10 * 1024 * 1024);
+            mDiskLruCache = DiskLruCache.open(cacheDir, getAppVersion(mContext), 1, 30 * 1024 * 1024);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         taskCollection = new HashSet<>();
+    }
+
+    /**
+     * 获取屏幕宽度, 用于计算图片宽度的默认值
+     * @param context
+     * @return
+     */
+    public int getScreenWidth(Context context){
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        wm.getDefaultDisplay().getMetrics(displayMetrics);
+        return displayMetrics.widthPixels;
+    }
+
+    public void setImageWidth(int mImageWidth) {
+        this.mImageWidth = mImageWidth;
     }
 
     private int getAppVersion(Context mContext) {
@@ -93,6 +116,8 @@ public class ImageLoader {
         } else {
             cachePath = mContext.getCacheDir();
         }
+
+        Log.d(TAG, "diskCacheDir=" + cachePath + File.separator + path);
         return new File(cachePath + File.separator + path);
     }
 
@@ -125,6 +150,10 @@ public class ImageLoader {
         }
     }
 
+    public boolean isExistTask(){
+        return taskCollection.isEmpty();
+    }
+
     /**
      * 将缓存记录同步到 journal 文件中去
      */
@@ -155,16 +184,20 @@ public class ImageLoader {
                 if (snapshot == null) {
                     DiskLruCache.Editor editor = mDiskLruCache.edit(key);
                     OutputStream outputStream = editor.newOutputStream(0);
-                    if (downloadUrlToStream(imageUrl, outputStream)) {
+                    final boolean isDownloadSuccess = downloadUrlToStream(imageUrl, outputStream);
+                    if ( isDownloadSuccess) {
                         editor.commit();
                     } else {
                         editor.abort();
                     }
+                    flushCache();
+Log.d(TAG, "isDownloadSuccess=" + isDownloadSuccess);
 
                     snapshot = mDiskLruCache.get(key);
                 }
 
                 if (snapshot != null){
+//                    Log.d(TAG, "try to get inputStream from snapshot");
                     fileInputStream = (FileInputStream) snapshot.getInputStream(0);
                     fileDescriptor = fileInputStream.getFD();
                 }
@@ -172,7 +205,9 @@ public class ImageLoader {
                 //解析为 bitmap
                 Bitmap bitmap = null;
                 if (fileDescriptor != null){
-                    bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+//                    bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+//                   bitmap = ImageUtil.decodeSimpleBitmapFromStream(fileInputStream, mImageWidth);
+                    bitmap = ImageUtil.decodeSimpleBitmapFromFileDescriptor(fileDescriptor, mImageWidth);
                 }
 
                 //添加到内存缓存中间
@@ -210,6 +245,8 @@ public class ImageLoader {
                 while ((b = bin.read()) != -1) {
                     bos.write(b);
                 }
+                bos.flush();
+Log.d(TAG, "image download finished");
 
                 return true;
 
@@ -240,6 +277,7 @@ public class ImageLoader {
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             taskCollection.remove(this);
+
             callOnLoadedBitmap(bitmap);
         }
     }

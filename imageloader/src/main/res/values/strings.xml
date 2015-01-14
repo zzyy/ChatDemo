@@ -4,5 +4,7 @@
     <string name="app_name">ImageLoader</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="border_top">border_top</string>
+    <string name="border_bottom">bordor_bottom</string>
 
 </resources>
