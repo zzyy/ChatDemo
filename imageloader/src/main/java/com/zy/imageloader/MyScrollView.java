@@ -1,14 +1,17 @@
 package com.zy.imageloader;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.AttributeSet;
+import android.widget.ActionMenuView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 /**
  * Created by Simon on 2015/1/13.
  */
-public class MyScrollView  extends ScrollView{
+public class MyScrollView  extends ScrollView implements ImageLoader.OnLoadedBitmapListener {
 
     private int columnWidth;
 
@@ -46,5 +49,28 @@ public class MyScrollView  extends ScrollView{
         if (changed){
 
         }
+    }
+
+    @Override
+    public void loadedBitmap(Bitmap bitmap) {
+        if (bitmap != null){
+            double ratio = bitmap.getWidth()/columnWidth*1.0;
+            int scaledHeight = (int) (bitmap.getHeight()/ratio);
+            addImage(bitmap, columnWidth, scaledHeight);
+        }
+    }
+
+    private ImageView mImageView;
+    private void addImage(Bitmap bitmap, int imageWidth, int imageHeight) {
+        LinearLayout.LayoutParams params = new ActionMenuView.LayoutParams(imageWidth, imageHeight);
+
+        final ImageView mImageView = new ImageView(getContext());
+        mImageView.setLayoutParams(params);
+        mImageView.setImageBitmap(bitmap);
+        mImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        mImageView.setPadding(5, 5, 5, 5);
+        mImageView.setTag();
+
+
     }
 }

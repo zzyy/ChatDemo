@@ -128,7 +128,7 @@ public class ImageLoader {
     /**
      * 将缓存记录同步到 journal 文件中去
      */
-    public void flushCache{
+    public void flushCache(){
         if (mDiskLruCache != null){
             try {
                 mDiskLruCache.flush();
