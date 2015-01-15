@@ -1,6 +1,7 @@
 package com.zy.imageloader;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Message;
@@ -11,8 +12,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Toast;
+
+import com.zy.imageloader.activity.ShowImageActivity;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by Simon on 2015/1/13.
@@ -67,7 +72,7 @@ public class MyScrollView  extends ScrollView implements ImageLoader.OnLoadedBit
                 lastScrollY = scrollY;
                 Message message = Message.obtain();
                 message.obj = myScrollView;
-                handler.sendMessageDelayed(message, 10);
+                handler.sendMessageDelayed(message, 5);
             }
 
         }
@@ -107,10 +112,9 @@ public class MyScrollView  extends ScrollView implements ImageLoader.OnLoadedBit
                 if (bitmap != null) {
                     imageView.setImageBitmap(bitmap);
                 }
-//                else {
-//                    LoadImageTask task = new LoadImageTask(imageView);
-//                    task.execute(imageUrl);
-//                }
+                else {
+                    imageLoader.loadBitmap(imageUrl, imageView);
+                }
             } else {
                 imageView.setImageResource(R.drawable.empty_photo);
             }
@@ -122,13 +126,16 @@ public class MyScrollView  extends ScrollView implements ImageLoader.OnLoadedBit
         super.onLayout(changed, l, t, r, b);
         if (changed && !loadOnce){
 
+            scrollViewHeight = getHeight();
+
             firstColumn = (LinearLayout) findViewById(R.id.first_column);
             secondColumn = (LinearLayout) findViewById(R.id.second_column);
             thirdColumn = (LinearLayout) findViewById(R.id.third_column);
             columnWidth = firstColumn.getWidth();
 
             scrollLayout = getChildAt(0);
-            scrollViewHeight = scrollLayout.getHeight();
+
+            Log.d(TAG, "scrollViewHeight=" + scrollViewHeight +"; scrollLayout="+ scrollLayout);
             imageLoader.setImageWidth(columnWidth);
 
             loadMoreImages();
@@ -144,28 +151,46 @@ public class MyScrollView  extends ScrollView implements ImageLoader.OnLoadedBit
         int startIndex = page*PAGE_SIZE;
         int endIndex = page*PAGE_SIZE + PAGE_SIZE;
 
-        if (endIndex > imageUrls.length){
-            endIndex = imageUrls.length;
-        }
+        final int maxImageIndex = imageUrls.length;
+        if (startIndex < maxImageIndex) {
 
-        for (int i = startIndex; i < endIndex; i++){
-            imageLoader.loadBitmap(imageUrls[i]);
+            if (endIndex > imageUrls.length) {
+                endIndex = imageUrls.length;
+            }
+
+            for (int i = startIndex; i < endIndex; i++) {
+                imageLoader.loadBitmap(imageUrls[i]);
+            }
+            page++;
+        } else {
+            Toast.makeText(getContext(), "没有更多图片 \n 随机加载", Toast.LENGTH_SHORT).show();
+            final Random random = new Random();
+            for (int i=0; i<15; i++){
+                imageLoader.loadBitmap(imageUrls[random.nextInt(maxImageIndex)]);
+            }
         }
 
     }
 
     //加载图片后 回调
     @Override
-    public void loadedBitmap(String url, Bitmap bitmap) {
-        Log.d(TAG, "loadedBitmap; bitmap=" + bitmap);
-        if (bitmap != null){
-            double ratio = bitmap.getWidth()/columnWidth*1.0;
-            int scaledHeight = (int) (bitmap.getHeight()/ratio);
+    public void loadedBitmap(String url, View view, Bitmap bitmap) {
+//        Log.d(TAG, "loadedBitmap; bitmap=" + bitmap);
+        if (bitmap == null) return;
+
+        final ImageView imageView = (ImageView) view;
+
+        if (imageView != null){
+            imageView.setImageBitmap(bitmap);
+        }else {
+            double ratio = bitmap.getWidth() / (columnWidth * 1.0);
+            int scaledHeight = (int) (bitmap.getHeight() / ratio);
+            Log.d(TAG, "ratio=" + ratio + "; bitmap.getWidth()=" + bitmap.getWidth() + "; bitmap.getHeight()=" + bitmap.getHeight());
             addImage(url, bitmap, columnWidth, scaledHeight);
         }
     }
 
-    private void addImage(String url, Bitmap bitmap, int imageWidth, int imageHeight) {
+    private void addImage(final String url, Bitmap bitmap, int imageWidth, int imageHeight) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(imageWidth, imageHeight);
 
         final ImageView mImageView = new ImageView(getContext());
@@ -175,6 +200,16 @@ public class MyScrollView  extends ScrollView implements ImageLoader.OnLoadedBit
         mImageView.setPadding(5, 5, 5, 5);
         mImageView.setTag(R.string.image_url, url);
 
+        mImageView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), ShowImageActivity.class);
+                intent.putExtra("imageUrl", url);
+                getContext().startActivity(intent);
+            }
+        });
+
+        Log.d(TAG, "imageHeight="+ imageHeight +"; imageWidth="+ imageWidth +"; image_url=" + url);
         findColumnToAdd(mImageView, imageHeight).addView(mImageView);
         imageViewList.add(mImageView);
     }

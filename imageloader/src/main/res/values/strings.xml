@@ -7,5 +7,6 @@
     <string name="border_top">border_top</string>
     <string name="border_bottom">bordor_bottom</string>
     <string name="image_url">image_url</string>
+    <string name="title_activity_show_image">ShowImageActivity</string>
 
 </resources>

@@ -4,12 +4,15 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v4.util.LruCache;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import com.jakewharton.disklrucache.DiskLruCache;
 
@@ -125,19 +128,45 @@ public class ImageLoader {
         }
     }
 
+    public Bitmap getBitmapFromDiskCache(String key) {
+        FileDescriptor fileDescriptor = null;
+        FileInputStream fileInputStream = null;
+        DiskLruCache.Snapshot snapshot = null;
+
+        try {
+            snapshot = mDiskLruCache.get(key);
+            if (snapshot != null) {
+                fileInputStream = (FileInputStream) snapshot.getInputStream(0);
+                fileDescriptor = fileInputStream.getFD();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //解析为 bitmap
+        Bitmap bitmap = null;
+        if (fileDescriptor != null) {
+            bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+        }
+        return bitmap;
+    }
+
     public Bitmap getBitmapFromMemoryCache(String key) {
         return mImageMemoryCache.get(key);
     }
 
+    public void loadBitmap(String url){
+        this.loadBitmap(url, null);
+    }
 
-    public void loadBitmap(String url) {
+    public void loadBitmap(String url, ImageView view) {
         Bitmap bitmap = getBitmapFromMemoryCache(url);
         if (bitmap == null) {
-            BitmapWorkerTask task = new BitmapWorkerTask();
+            BitmapWorkerTask task = new BitmapWorkerTask(view);
             taskCollection.add(task);
             task.execute(url);
         } else {
-            callOnLoadedBitmap(url, bitmap);
+            callOnLoadedBitmap(url, view, bitmap);
         }
     }
 
@@ -168,6 +197,13 @@ public class ImageLoader {
 
     class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
         private String imageUrl;
+
+        private View view;
+
+        BitmapWorkerTask() {}
+        BitmapWorkerTask(View view) {
+            this.view = view;
+        }
 
         @Override
         protected Bitmap doInBackground(String... params) {
@@ -277,14 +313,14 @@ Log.d(TAG, "image download finished");
         protected void onPostExecute(Bitmap bitmap) {
             taskCollection.remove(this);
 
-            callOnLoadedBitmap(imageUrl, bitmap);
+            callOnLoadedBitmap(imageUrl, (ImageView) view, bitmap);
         }
     }
 
 
-    void callOnLoadedBitmap(String url, Bitmap bitmap) {
+    void callOnLoadedBitmap(String url, View view ,Bitmap bitmap) {
         if (mOnLoadedBitmapListener != null) {
-            mOnLoadedBitmapListener.loadedBitmap(url, bitmap);
+            mOnLoadedBitmapListener.loadedBitmap(url, view, bitmap);
         }
     }
 
@@ -293,7 +329,7 @@ Log.d(TAG, "image download finished");
     }
 
     public interface OnLoadedBitmapListener {
-        void loadedBitmap(String url, Bitmap bitmap);
+        void loadedBitmap(String url, View imageView,Bitmap bitmap);
     }
 }
 
