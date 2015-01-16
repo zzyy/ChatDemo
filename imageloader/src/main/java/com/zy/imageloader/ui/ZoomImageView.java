@@ -37,14 +37,35 @@ public class ZoomImageView extends View {
     private int bitmapWidth;
     private int bitmapHeight;
 
+    //图片当前宽高, 即被缩放后的宽高
+    private int currentBitmapWidth;
+    private int currentBitmapHeight;
+
     //view允许的宽高, 即ZoomImageView本身的宽高
     private int layoutWidth;
     private int layoutHeight;
 
+    //缩放时的中心点
+    private int centerPointX;
+    private int centerPointY;
+
     //图像文件
     private Bitmap sourceBitmap;
+    //2手指之间距离
+    private int lastFingerDistance;
 
+    //当前x, y 移动距离
+    private int currentTranslateX;
+    private int currentTranslateY;
 
+    //最先初始化时的缩放比
+    private float initScaleRatio;
+    //当前缩放比
+    private float currentScaleRatio = 1;
+
+    //当前 x, y 和最后一次的距离差值
+    private int deltaX;
+    private int deltaY;
 
 
     public ZoomImageView(Context context, AttributeSet attrs) {
@@ -78,9 +99,87 @@ public class ZoomImageView extends View {
         }
     }
 
+    private int lastX = -1;
+    private int lastY = -1;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        int action = event.getAction();
+        switch (action & MotionEvent.ACTION_MASK){
+            case MotionEvent.ACTION_POINTER_DOWN:
+                if (event.getPointerCount() == 2){
+                    lastFingerDistance = calcuateDistanceBetweenFingers(event);
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (event.getPointerCount() == 1){
+                    //移动
+                    int x = (int) event.getX();
+                    int y = (int) event.getY();
+
+                    if ( lastX == -1 && lastY == -1){
+                        lastX = x;
+                        lastY = y;
+                    }
+
+                    currentStatus = STATUS_MOVE;
+                    deltaX = x - lastX;
+                    deltaY = y - lastY;
+
+
+                    if (currentTranslateX + deltaX >0){
+                        deltaX = 0;
+                    }else if (layoutWidth - (currentTranslateX + deltaX) > currentBitmapWidth  ){
+                        deltaX = 0;
+                    }
+
+                    if (currentTranslateY + deltaY > 0){
+                        deltaY = 0;
+                    }else if (layoutHeight - (currentTranslateY + deltaY) >currentBitmapHeight){
+                        deltaY = 0;
+                    }
+
+                    invalidate();
+
+                }else if (event.getPointerCount() == 2){
+                    //zoom
+                    //计算手指的中心点
+                    calculateCenterPoint(event);
+
+                    int fingerDistance = calcuateDistanceBetweenFingers(event);
+                    if (fingerDistance > lastFingerDistance ){
+                        currentStatus = STATUS_ZOOM_OUT;
+                    }else if (fingerDistance <= lastFingerDistance){
+                        currentStatus = STATUS_ZOOM_IN;
+                    }
+
+                    float scaleRatio = fingerDistance/lastFingerDistance;
+
+                    currentScaleRatio *= scaleRatio;
+                    if (currentScaleRatio > 4*initScaleRatio){
+                        currentScaleRatio = 4*initScaleRatio;
+                    }else if (currentScaleRatio < initScaleRatio){
+                        currentScaleRatio = initScaleRatio;
+                    }
+
+                    lastFingerDistance = fingerDistance;
+                    invalidate();
+                }
+
+                break;
+        }
+
         return super.onTouchEvent(event);
+    }
+
+    private void calculateCenterPoint(MotionEvent event) {
+        centerPointX = (int) ((event.getX(0) + event.getX(1))/2);
+        centerPointY = (int) ((event.getY(0) + event.getY(1))/2);
+    }
+
+    private int calcuateDistanceBetweenFingers(MotionEvent event) {
+        float disX = event.getX(0) - event.getX(1);
+        float disY = event.getY(0) - event.getY(1);
+        return (int) Math.sqrt(disX*disX + disY*disY);
     }
 
     @Override
@@ -92,12 +191,36 @@ public class ZoomImageView extends View {
                 initBitmap(canvas);
                 break;
             case STATUS_ZOOM_OUT:
-                break;
             case STATUS_ZOOM_IN:
+                zoom(canvas);
                 break;
             case STATUS_MOVE:
+                move(canvas);
                 break;
         }
+    }
+
+    private void zoom(Canvas canvas) {
+        matrix.reset();
+
+        matrix.setScale(currentScaleRatio, currentScaleRatio);
+
+        currentBitmapWidth = (int) (bitmapWidth*currentScaleRatio);
+        currentBitmapHeight = (int) (bitmapHeight*currentScaleRatio);
+
+
+    }
+
+    private void move(Canvas canvas) {
+        matrix.reset();
+        matrix.setScale(currentScaleRatio, currentScaleRatio);
+
+        currentTranslateX = currentTranslateY + deltaX;
+        currentTranslateY = currentTranslateY + deltaY;
+
+        matrix.postTranslate(currentTranslateX, currentTranslateY);
+
+        canvas.drawBitmap(sourceBitmap, matrix, null);
     }
 
     private void initBitmap(Canvas canvas) {
@@ -113,19 +236,32 @@ public class ZoomImageView extends View {
             float ratioY = (float) (layoutHeight*1.0/bitmapHeight);
 
             if (ratioX < ratioY){
-                matrix.setScale(ratioX, ratioX);
-
                 float scaledY = bitmapHeight*ratioX;
-                matrix.postTranslate(0f, (layoutHeight - scaledY)/2);
-            }else {
-                matrix.setScale(ratioY, ratioY);
 
+                currentScaleRatio = ratioX;
+                currentTranslateY = (int) ((layoutHeight - scaledY)/2);
+
+                matrix.setScale(currentScaleRatio, currentScaleRatio);
+                matrix.postTranslate(0f, currentTranslateY);
+            }else {
                 float scaledX = bitmapWidth * ratioY;
-                matrix.postTranslate((layoutWidth - scaledX)/2, 0);
+
+                currentScaleRatio = ratioY;
+                currentTranslateX = (int) ((layoutWidth - scaledX)/2);
+
+                matrix.setScale(currentScaleRatio, currentScaleRatio);
+                matrix.postTranslate(currentTranslateX, 0);
             }
         }else {
-            matrix.postTranslate((layoutWidth - bitmapWidth)*1.0f/2, (layoutHeight - bitmapHeight)*1.0f/2 );
+            currentTranslateX = (int) ((layoutWidth - bitmapWidth)*1.0f/2);
+            currentTranslateY = (int) ((layoutHeight - bitmapHeight)*1.0f/2);
+
+            matrix.postTranslate(currentTranslateX, currentTranslateY );
         }
+
+        initScaleRatio = currentScaleRatio;
+        currentBitmapWidth = (int) (bitmapWidth * currentScaleRatio);
+        currentBitmapHeight = (int) (bitmapHeight * currentScaleRatio);
 
         canvas.drawBitmap(sourceBitmap, matrix, null);
     }
