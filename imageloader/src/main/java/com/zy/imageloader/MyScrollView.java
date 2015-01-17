@@ -47,7 +47,7 @@ public class MyScrollView  extends ScrollView implements ImageLoader.OnLoadedBit
     private boolean loadOnce;
 
     //用于存储所有的imageView
-    private ArrayList<ImageView> imageViewList = new ArrayList<>();
+    private ArrayList<ImageView> imageViewList = new ArrayList<ImageView>();
 
     private ImageLoader imageLoader;
 

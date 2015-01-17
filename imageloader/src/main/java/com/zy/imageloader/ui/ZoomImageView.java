@@ -10,8 +10,10 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 
 import com.zy.imageloader.R;
 
@@ -62,10 +64,13 @@ public class ZoomImageView extends View {
     private float initScaleRatio;
     //当前缩放比
     private float currentScaleRatio = 1;
+    //在当前缩放比 上继续缩放的比率, 用于当前图片已经是zoom状态, 计算translate的距离
+    private float scaleRatio;
 
     //当前 x, y 和最后一次的距离差值
     private int deltaX;
     private int deltaY;
+    private int touchSlop;
 
 
     public ZoomImageView(Context context, AttributeSet attrs) {
@@ -85,6 +90,9 @@ public class ZoomImageView extends View {
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.ZoomImageView, defStyle, 0);
 
+        ViewConfiguration viewConfiguration = ViewConfiguration.get(getContext());
+        touchSlop = viewConfiguration.getScaledTouchSlop();
+
 
         a.recycle();
 
@@ -103,9 +111,11 @@ public class ZoomImageView extends View {
     private int lastY = -1;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+//        Log.d(TAG, "MotionEvent; event.getPointerCount()=" + event.getPointerCount());
         int action = event.getAction();
         switch (action & MotionEvent.ACTION_MASK){
             case MotionEvent.ACTION_POINTER_DOWN:
+                Log.d(TAG, "ACTION_POINTER_DOWN; event.getPointerCount()=" + event.getPointerCount());
                 if (event.getPointerCount() == 2){
                     lastFingerDistance = calcuateDistanceBetweenFingers(event);
                 }
@@ -116,26 +126,57 @@ public class ZoomImageView extends View {
                     int x = (int) event.getX();
                     int y = (int) event.getY();
 
+//                Log.d(TAG, "ACTION_MOVE; event.getPointerCount()=" + event.getPointerCount() +"; x=" +x+ "; y=" +y);
                     if ( lastX == -1 && lastY == -1){
                         lastX = x;
                         lastY = y;
+                    }
+
+                    if (Math.abs(x-lastX) < touchSlop || Math.abs((y-lastY)) < touchSlop){
+                        break;
                     }
 
                     currentStatus = STATUS_MOVE;
                     deltaX = x - lastX;
                     deltaY = y - lastY;
 
+                    Log.d(TAG, "deltaX=" + deltaX +"; deltaY=" + deltaY + "; touchSlop=" + touchSlop+ "; max=" + (layoutWidth - currentBitmapWidth));
 
-                    if (currentTranslateX + deltaX >0){
-                        deltaX = 0;
-                    }else if (layoutWidth - (currentTranslateX + deltaX) > currentBitmapWidth  ){
-                        deltaX = 0;
+                    currentTranslateX += deltaX;
+                    currentTranslateY += deltaY;
+
+                    /*if (currentTranslateX > 0){
+                        currentTranslateX = 0;
+                    }else if (layoutWidth - currentTranslateX  > currentBitmapWidth  ){
+                        currentTranslateX = layoutWidth - currentBitmapWidth;
                     }
 
-                    if (currentTranslateY + deltaY > 0){
-                        deltaY = 0;
-                    }else if (layoutHeight - (currentTranslateY + deltaY) >currentBitmapHeight){
-                        deltaY = 0;
+                    if (currentTranslateY  > 0){
+                        currentTranslateY = 0;
+                    }else if (layoutHeight - currentTranslateY  >currentBitmapHeight){
+                        currentTranslateY = layoutHeight - currentBitmapHeight;
+                    }*/
+
+                    //图片宽小于屏幕宽度
+                    if (currentBitmapWidth < layoutWidth){
+                        currentTranslateX = (layoutWidth - currentBitmapWidth)/2;
+                    }else {
+                        if (currentTranslateX > 0){
+                            currentTranslateX = 0;
+                        }else if (layoutWidth - currentTranslateX > currentBitmapWidth){
+                            currentTranslateX = layoutWidth - currentBitmapWidth;
+                        }
+                    }
+
+                    //图片高度小于布局高
+                    if (currentBitmapHeight < layoutHeight){
+                        currentTranslateY = (layoutHeight - currentBitmapHeight)/2;
+                    }else {
+                        if (currentTranslateY > 0){
+                            currentTranslateY = 0;
+                        }else if (layoutHeight - currentTranslateY > currentBitmapHeight){
+                            currentTranslateY = layoutHeight - currentTranslateY;
+                        }
                     }
 
                     invalidate();
@@ -152,7 +193,7 @@ public class ZoomImageView extends View {
                         currentStatus = STATUS_ZOOM_IN;
                     }
 
-                    float scaleRatio = fingerDistance/lastFingerDistance;
+                    scaleRatio = (float) (fingerDistance*1.0/lastFingerDistance);
 
                     currentScaleRatio *= scaleRatio;
                     if (currentScaleRatio > 4*initScaleRatio){
@@ -164,11 +205,20 @@ public class ZoomImageView extends View {
                     lastFingerDistance = fingerDistance;
                     invalidate();
                 }
-
                 break;
+
+            case MotionEvent.ACTION_POINTER_UP:
+                if (event.getPointerCount() == 2){
+                    lastX = lastY = -1;
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                lastX = lastY = -1;
+                break;
+
         }
 
-        return super.onTouchEvent(event);
+        return true;
     }
 
     private void calculateCenterPoint(MotionEvent event) {
@@ -208,15 +258,38 @@ public class ZoomImageView extends View {
         currentBitmapWidth = (int) (bitmapWidth*currentScaleRatio);
         currentBitmapHeight = (int) (bitmapHeight*currentScaleRatio);
 
+        //图片宽小于屏幕宽度
+        if (currentBitmapWidth < layoutWidth){
+            currentTranslateX = (layoutWidth - currentBitmapWidth)/2;
+        }else {
+            currentTranslateX = (int) (currentTranslateX*scaleRatio - centerPointX*scaleRatio + centerPointX);
+            if (currentTranslateX > 0){
+                currentTranslateX = 0;
+            }else if (layoutWidth - currentTranslateX > currentBitmapWidth){
+                currentTranslateX = layoutWidth - currentBitmapWidth;
+            }
+        }
 
+        //图片高度小于布局高
+        if (currentBitmapHeight < layoutHeight){
+            currentTranslateY = (layoutHeight - currentBitmapHeight)/2;
+        }else {
+            currentTranslateY = (int) (currentTranslateY*scaleRatio - centerPointY*scaleRatio + centerPointY);
+            if (currentTranslateY > 0){
+                currentTranslateY = 0;
+            }else if (layoutHeight - currentTranslateY > currentBitmapHeight){
+                currentTranslateY = layoutHeight - currentTranslateY;
+            }
+        }
+
+
+        matrix.postTranslate(currentTranslateX, currentTranslateY);
+        canvas.drawBitmap(sourceBitmap, matrix, null);
     }
 
     private void move(Canvas canvas) {
         matrix.reset();
         matrix.setScale(currentScaleRatio, currentScaleRatio);
-
-        currentTranslateX = currentTranslateY + deltaX;
-        currentTranslateY = currentTranslateY + deltaY;
 
         matrix.postTranslate(currentTranslateX, currentTranslateY);
 

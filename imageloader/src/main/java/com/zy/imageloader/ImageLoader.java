@@ -80,7 +80,7 @@ public class ImageLoader {
             e.printStackTrace();
         }
 
-        taskCollection = new HashSet<>();
+        taskCollection = new HashSet<BitmapWorkerTask>();
     }
 
     /**

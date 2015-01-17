@@ -1,1 +1,1 @@
-include ':slidemenu', ':slidemenu2', ':app', ':toucheventdemo', ':bouncescroll', ':imageloader'
+include ":imageloader"
